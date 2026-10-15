@@ -6,6 +6,7 @@ use App\Enum\Category;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event
@@ -16,25 +17,38 @@ class Event
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $Titre = null;
+    #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
+    private ?string $titre = null;
+
+    // NotNull suffit pour une date : le formulaire convertit déjà la saisie en objet DateTime.
+    // Réf. : https://symfony.com/doc/7.4/reference/constraints/NotNull.html
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotNull(message: 'La date est obligatoire.')]
+    private ?\DateTime $date = null;
+
+    // Colonne non nullable : le sujet impose ce champ.
+    #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: 'Les informations sont obligatoires.')]
+    private ?string $informations = null;
+
+   // Réf. : https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/basic-mapping.html
+    
+    #[ORM\Column(enumType: Category::class)]
+    #[Assert\NotNull(message: 'Choisissez une catégorie.')]
+    private ?Category $category = null;
 
     #[ORM\Column]
-    private ?\DateTime $Date = null;
+    #[Assert\NotNull(message: 'Le nombre de places est obligatoire.')]
+    #[Assert\Positive(message: 'Le nombre de places doit être supérieur à 0.')]
+    private ?int $nombreDePlaces = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $Informations = null;
+    // On stocke uniquement le NOM du fichier ; nullable car il n'existe qu'après l'upload.
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $image = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: Category::class)]
-    private array $Catégories = [];
-
+    // Valeur par défaut false = "Non validé" à la création (point 3 du sujet).
     #[ORM\Column]
-    private ?int $Nombre_de_places = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $Image = null;
-
-    #[ORM\Column]
-    private ?bool $Statut = null;
+    private bool $validated = false;
 
     public function getId(): ?int
     {
@@ -43,87 +57,85 @@ class Event
 
     public function getTitre(): ?string
     {
-        return $this->Titre;
+        return $this->titre;
     }
 
-    public function setTitre(string $Titre): static
+    public function setTitre(string $titre): static
     {
-        $this->Titre = $Titre;
+        $this->titre = $titre;
 
         return $this;
     }
 
     public function getDate(): ?\DateTime
     {
-        return $this->Date;
+        return $this->date;
     }
 
-    public function setDate(\DateTime $Date): static
+    public function setDate(\DateTime $date): static
     {
-        $this->Date = $Date;
+        $this->date = $date;
 
         return $this;
     }
 
     public function getInformations(): ?string
     {
-        return $this->Informations;
+        return $this->informations;
     }
 
-    public function setInformations(?string $Informations): static
+    public function setInformations(string $informations): static
     {
-        $this->Informations = $Informations;
+        $this->informations = $informations;
 
         return $this;
     }
 
-    /**
-     * @return Category[]
-     */
-    public function getCatégories(): array
+    public function getCategory(): ?Category
     {
-        return $this->Catégories;
+        return $this->category;
     }
 
-    public function setCatégories(array $Catégories): static
+    public function setCategory(Category $category): static
     {
-        $this->Catégories = $Catégories;
+        $this->category = $category;
 
         return $this;
     }
 
     public function getNombreDePlaces(): ?int
     {
-        return $this->Nombre_de_places;
+        return $this->nombreDePlaces;
     }
 
-    public function setNombreDePlaces(int $Nombre_de_places): static
+    public function setNombreDePlaces(int $nombreDePlaces): static
     {
-        $this->Nombre_de_places = $Nombre_de_places;
+        $this->nombreDePlaces = $nombreDePlaces;
 
         return $this;
     }
 
     public function getImage(): ?string
     {
-        return $this->Image;
+        return $this->image;
     }
 
-    public function setImage(?string $Image): static
+    public function setImage(?string $image): static
     {
-        $this->Image = $Image;
+        $this->image = $image;
 
         return $this;
     }
 
-    public function isStatut(): ?bool
+    // Convention "is..." pour un booléen : utilisable en Twig avec event.validated.
+    public function isValidated(): bool
     {
-        return $this->Statut;
+        return $this->validated;
     }
 
-    public function setStatut(bool $Statut): static
+    public function setValidated(bool $validated): static
     {
-        $this->Statut = $Statut;
+        $this->validated = $validated;
 
         return $this;
     }
