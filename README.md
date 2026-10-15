@@ -40,12 +40,12 @@ Nom       : AFATON
 Prénom    : ERNEST
 
 Compte admin (ROLE_ADMIN)
-  Email        : ...
-  Mot de passe : ...
+  Email        : admin@admin.admin
+  Mot de passe : adminadmin
 
 Compte utilisateur
-  Email        : ...
-  Mot de passe : ...
+  Email        : client@client.client
+  Mot de passe : clientclient
 ```
 
 Commitez aussi la **base SQLite** avec quelques événements, utilisateurs et inscriptions de test. Le dossier `var/` étant ignoré par Git, il faut forcer l'ajout :
