@@ -20,9 +20,9 @@ public function findUpcomingAndValidated(?string $category = null): array
 {
     $qb = $this->createQueryBuilder('e')
         
-       // ->where('e.validated = :validated')
+        ->where('e.validated = :validated')
         ->andWhere('e.date >= :now')
-       // ->setParameter('validated', true)
+        ->setParameter('validated', true)
         ->setParameter('now', new \DateTime())
         ->orderBy('e.date', 'ASC');
 

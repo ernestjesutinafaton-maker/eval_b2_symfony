@@ -141,7 +141,6 @@ class Event
 
         return $this;
     }
-    // ... dans la classe Event :
 
     #[ORM\ManyToMany(targetEntity: User::class)]
     private Collection $users;
@@ -154,6 +153,7 @@ class Event
     /**
      * @return Collection<int, User>
      */
+
     public function getUsers(): Collection
     {
         return $this->users;

@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Validation des événements{% endblock %}
+
+{% block body %}
+    <h1>Événements en attente de validation</h1>
+
+    {% if events is empty %}
+        <p>Aucun événement en attente de validation pour le moment.</p>
+    {% else %}
+        <div class="events-list">
+            {% for event in events %}
+                <div class="card">
+                    <h2>{{ event.titre }}</h2>
+                    <p><strong>Catégorie :</strong> {{ event.category ? event.category.value : 'Non catégorisé' }}</p>
+                    <p><strong>Date :</strong> {{ event.date|date('d/m/Y H:i') }}</p>
+                    <p><strong>Places :</strong> {{ event.nombreDePlaces }}</p>
+                    <p>{{ event.informations }}</p>
+
+                    <a href="{{ path('app_validate_approve', {'id': event.id}) }}" class="btn btn-primary">
+                        Valider l'événement
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
