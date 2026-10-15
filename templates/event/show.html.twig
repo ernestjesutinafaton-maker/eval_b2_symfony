@@ -1,50 +1,55 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Soirée jazz au Kiosque{% endblock %}
+{% block title %}{{ event.titre }}{% endblock %}
 
 {% block body %}
-    <a class="back-link" href="{{ path('app_home') }}">← Retour aux événements</a>
+    <div class="narrow">
+        <a class="back-link" href="{{ path('app_home') }}">← Retour aux événements</a>
 
-    <article class="cat-concert">
-        <header class="detail-hero" style="background-image: url('{{ asset('images/concert.jpg') }}')">
-            <div class="detail-hero-content">
-                <span class="badge">Concert</span>
-                <h1>Soirée jazz au Kiosque</h1>
-                <p>Samedi 07/11/2026 · 20h30</p>
+        <div class="card">
+            {# Image de l'événement #}
+            {% if event.image %}
+                <img src="{{ asset('uploads/events/' ~ event.image) }}" alt="{{ event.titre }}" class="event-detail-image">
+            {% else %}
+                <img src="{{ asset('images/default.jpg') }}" alt="Image par défaut" class="event-detail-image">
+            {% endif %}
+
+            <h1>{{ event.titre }}</h1>
+
+            <div class="event-meta">
+                <p><strong>Catégorie :</strong> {{ event.category ? event.category.label : 'Non catégorisé' }}</p>
+                <p><strong>Date :</strong> {{ event.date ? event.date|date('d/m/Y à H:i') : 'Date non précisée' }}</p>
+                <p><strong>Places restantes :</strong> {{ event.nombreDePlaces }}</p>
+                
+                {# Badge de statut si besoin #}
+                {% if not event.isValidated %}
+                    <p><span class="badge badge-warning">En attente de validation</span></p>
+                {% endif %}
             </div>
-        </header>
 
-        <div class="detail-grid">
-            <section class="card">
+            <hr>
+
+            <div class="event-description">
                 <h2>Informations</h2>
-                <p>Le quartet CuRuba vous propose une soirée de jazz antillais au Kiosque du parc municipal.</p>
-                <p>Programme : 20h30 première partie, 21h30 concert principal. Buvette sur place, entrée libre sur inscription.</p>
-            </section>
-
-            <aside class="card booking">
-                <p class="places"><strong>12</strong> places restantes sur 80</p>
-                <div class="progress"><span style="width: 85%"></span></div>
-
-                <form method="post">
-                    <button type="submit" class="btn btn-block">S'inscrire</button>
-                </form>
-
-                {# Variante quand l'utilisateur est déjà inscrit :
-                <p class="muted">Vous êtes inscrit à cet événement.</p>
-                <form method="post">
-                    <button type="submit" class="btn btn-secondary btn-block">Se désinscrire</button>
-                </form>
-                #}
-
-                {# Variante quand l'événement est complet :
-                <p class="places"><span class="badge badge-full">Complet</span></p>
-                <button class="btn btn-block" disabled>Complet</button>
-                #}
-
-                {# Variante quand l'utilisateur n'est pas connecté :
-                <a class="btn btn-block" href="{{ path('app_login') }}">Connectez-vous pour vous inscrire</a>
-                #}
-            </aside>
+                <p>{{ event.informations|nl2br }}</p>
+            </div>
         </div>
-    </article>
+    </div>
+    <div class="event-actions">
+    {% if app.user %}
+        {% if event.users.contains(app.user) %}
+            <a href="{{ path('app_event_unsubscribe', {'id': event.id}) }}" class="btn btn-danger">
+                Se désinscrire
+            </a>
+        {% elseif event.nombreDePlaces > 0 %}
+            <a href="{{ path('app_event_subscribe', {'id': event.id}) }}" class="btn btn-primary">
+                S'inscrire
+            </a>
+        {% else %}
+            <span class="badge badge-full">Complet</span>
+        {% endif %}
+    {% else %}
+        <p><a href="{{ path('app_login') }}">Connectez-vous</a> pour vous inscrire à cet événement.</p>
+    {% endif %}
+</div>
 {% endblock %}
